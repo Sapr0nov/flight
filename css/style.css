@@ -1,0 +1,95 @@
+* {
+    padding:0;
+    border:0;
+    margin:0;
+}
+.container {
+    min-width: 350px;
+    min-height: 400px;
+    width: 100vw;
+    height: 100vh;
+}
+.field {
+    width: 100%;
+    height: 100%;
+    background-color: #212121;
+    background-image: url('../img/fon.jpg');
+    background-size: contain;
+}
+.player {
+    display: block;
+    position: fixed;
+    left: 47vw;
+    top: 80vh;
+    width: 5vw;
+    height: 6.7vw;
+    background-repeat: no-repeat;
+    background-image: url('../img/ship.png');
+    background-size: contain;
+}
+.player.left {
+    background-image: url('../img/shipLeft.png');   
+}
+.player.right {
+    background-image: url('../img/shipRight.png');
+}
+.shoot {
+    z-index: 3;
+    display: block;
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: wheat;
+}
+.shoot.shoot1 {
+    background-color: lightskyblue;
+    width: 2px;
+    border-left: 1px solid blue;
+    border-right: 1px solid blue;
+}
+.shoot.shoot2 {
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: lightskyblue;
+}
+.enemy {
+    z-index: 2;
+    display: block;
+    position: fixed;
+    width: 6vw;
+    height: 5vw;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.enemy1 {
+    background-image: url('../img/asteroid.png');
+    background-size: 56vw 56vw;
+    width: 6vw;
+    height: 6vw;
+}
+
+.enemy2 {
+    background-image: url('../img/enemy02.png');
+}
+.enemy3 {
+    background-image: url('../img/enemy03.png');
+}
+.enemy4 {
+    background-image: url('../img/enemy04.png');
+}
+.enemy5 {
+    background-image: url('../img/enemy05.png');
+}
+.enemy6 {
+    background-image: url('../img/enemy06.png');
+}
+.enemy7 {
+    background-image: url('../img/enemy07.png');
+}
+.enemy8 {
+    background-image: url('../img/enemy08.png');
+}
+.enemy9 {
+    background-image: url('../img/enemy09.png');
+}
