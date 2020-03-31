@@ -7,6 +7,13 @@ const game = {};
     game.skyFPS = 15; // 1 reload per X ms 
     game.autofire = true;
     game.enemyDy = 0.5;
+    game.control = 'mouse'; // wasd  
+    game.magnitoPoint = {};
+    game.fireSpeed = 300; //ms
+    game.timerBG;
+    game.timerWave;
+    game.timerMove;
+    game.timerAction;
 
 const player = {};
     player.x = 47;
@@ -15,7 +22,7 @@ const player = {};
     player.dy = 0;
     player.speed = 0.1; // 1 reload per X ms 
     player.weapon = 1;
-    player.fireSpeed = 300; //ms
+
     shoots = [];
     enemies = [];
 
@@ -57,16 +64,38 @@ const shipMove = (field) => {
         const ship = document.querySelector('.player');
         ship.style.opacity = 0.1;
     }
-
-    ( (player.x + player.dx * player.speed) <= 0 ) || ( (player.x + player.dx * player.speed) > 90 ) 
+    if (game.control == 'wasd') {
+        ( (player.x + player.dx * player.speed) <= 0 ) || ( (player.x + player.dx * player.speed) > 90 ) 
         ? player.dx = 0 
         : player.x += player.dx * player.speed;
 
     ( (player.y + player.dy * player.speed) <= 0 ) || ( (player.y + player.dy * player.speed) > 90 ) 
         ? player.dy = 0 
         : player.y += player.dy * player.speed;
-    player.y += player.dy * player.speed;
+    }
 
+    if (game.control == 'mouse') {
+        if (( (player.x + player.dx * player.speed) <= 0 ) || ( (player.x + player.dx * player.speed) > 90 )) {
+            player.dx = 0;
+        }else{
+            if  (Math.abs(game.magnitoPoint.x - player.x - player.dx * player.speed) < Math.abs(game.magnitoPoint.x - player.x) ) {
+                player.x += player.dx * player.speed;
+            }else{
+                player.dx = 0;
+            }
+        }
+
+        if (( (player.y + player.dy * player.speed) <= 0 ) || ( (player.y + player.dy * player.speed) > 90 )) {
+            player.dy = 0 
+        }else{
+            if  (Math.abs(game.magnitoPoint.y - player.y - player.dy * player.speed) < Math.abs(game.magnitoPoint.y - player.y) ) {
+                player.y += player.dy * player.speed;
+            }else{
+                player.dy = 0;
+            }
+        }
+    }
+    
     /* Player's shoots */ 
     shoots.forEach((shoot,i) => {
 
@@ -174,7 +203,8 @@ const shipFire = (field) => {
 } 
 
 
-const addEnemy = (field,newEnemy) => {
+const addEnemy = (field,newEnemy) =>  {
+
     if (enemies.length > 40) return;
     const enemy = document.createElement('div');
     field.appendChild(enemy);
@@ -201,6 +231,7 @@ const addEnemy = (field,newEnemy) => {
     enemies.push(enemy);
 } 
 
+/* ============================================================================*/
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -210,70 +241,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
     field.style.backgroundPositionX = '0vw';
     field.style.backgroundPositionY = game.skyPosY + 'vh';
 
-    /* Background Animation */
-    setInterval(() => {
-        backgroundShift(field);
-        drawShip(ship);
-    }, game.skyFPS);
-
-    setInterval(() => {
-        (game.speed > 0.7) ? 
-        agame.speed = 0.1 :
-        game.speed += game.accelerate;
-        game.enemyDy += 0.5;
-
-        let newEnemy = {
-            'x' : 10,
-            'y' : -20,
-            'dx' : 0.5,
-            'dy' : 0.2,
-            'speed' : 0.07,
-            'type' : 2
-        };
-        for (let i=0; i<30; i++) {
-            if (i==10) {
-                newEnemy.x -= 60; 
-                newEnemy.y -= 30;
-            }
-            if (i==20) {
-                newEnemy.x -= 60; 
-                newEnemy.y -= 30;
-            }
-            newEnemy.x += 6;
-            newEnemy.y += 1;
-            addEnemy(field, newEnemy);
-        }
-
-    }, game.accelerateTime); 
-
-    /* ship moved */
-    setInterval(() => {
-        shipMove(field);
-        enemiesMove(field, animate);
-    }, player.speed);
-
-    /* generate enemies */ 
-    setInterval(() => {
-        let randomEnemy = {
-            'x' : 1 + Math.floor(Math.random() * 99),
-            'y' : -10,
-            'dx' : -2 + Math.random() * 4,
-            'dy' : game.enemyDy + Math.random() * (2.0 - game.enemyDy),
-            'speed' : 0.03 + Math.random() * 0.03,
-            'type' : 1
-        }
-        addEnemy(field,randomEnemy);
-    }, game.enemiesGenerationSpeed);
+    game.timerBG = startTimerBG(field,ship);
+    game.timerAction = startTimerAction(field);
+    game.timerMove = startTimerMove(field,animate);
+    game.timerWave = startTimerWave(field);
 
     /* autofire */
     setInterval(() => {
         if (game.autoFire) {
             shipFire(field);
         }
-    }, player.fireSpeed);
-
+    }, game.fireSpeed);
 
     /* Controls */
+
     document.addEventListener('keydown', (event) => {
         switch (event.keyCode) {
             case 87 : player.dy = -1; break;
@@ -283,10 +264,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
             case 71 : game.autoFire = !game.autoFire; break;
             case 49 : player.weapon = 1; break;
             case 50 : player.weapon = 2; break;
-            case 51 :  player.fireSpeed = 100; break;
+            case 51 : game.control = 'wasd';  document.querySelector('.field').style.cursor = 'pointer'; break;
+            case 52 : game.control = 'mouse'; break;
+            case 53 :   clearInterval(game.timerBG);
+                        clearInterval(game.timerAction);
+                        clearInterval(game.timerMove);
+                        clearInterval(game.timerWave);
+                    break;
+            case 54 :   clearInterval(game.timerBG);
+                        clearInterval(game.timerAction);
+                        clearInterval(game.timerMove);
+                        clearInterval(game.timerWave);
+                        game.timerBG = startTimerBG(field,ship);
+                        game.timerAction = startTimerAction(field);
+                        game.timerMove = startTimerMove(field,animate);
+                        game.timerWave = startTimerWave(field);
+                        break;
         }
        
     });
+
     document.addEventListener('keyup', (event) => {
         switch (event.keyCode) {
             case 87 : player.dy = 0; break;
@@ -297,6 +294,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     });
 
+    document.addEventListener('mousemove', (event => {
+        if (game.control == 'wasd') return;
+
+        let cursorX = Math.floor(event.clientX / document.documentElement.clientWidth * 100);
+        let cursorY = Math.floor(event.clientY / document.documentElement.clientHeight * 100);
+        game.magnitoPoint = {'x': cursorX,'y': cursorY};
+
+        document.querySelector('.field').style.cursor = 'none'; //crosshair
+
+        (cursorX > player.x + 2) ? player.dx = 1 : player.dx = -1;
+        (cursorY > player.y + 3) ? player.dy = 1 : player.dy = -1;
+        if (cursorX < player.x + 2 && cursorX > player.x - 2 ) {player.dx = 0; }
+        if (cursorY < player.y + 2 && cursorY > player.y - 2 ) {player.dy = 0; }
+
+    }))
+
+    document.addEventListener('click', ( event => {
+        shipFire(field);
+    }))
+
+    document.addEventListener( "contextmenu", function(e) {
+        e.preventDefault();
+
+        player.weapon = 2;
+        shipFire(field);
+        player.weapon = 1;
+      });
 
     const canvas = document.getElementById("canvas");
     canvas.style.position = "fixed";
@@ -326,6 +350,68 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* Animation */
 });
 
+/* Timers */
+function startTimerBG(field,ship) {
+    return setInterval(() => {
+        backgroundShift(field);
+        drawShip(ship);
+    }, game.skyFPS);
+}
+
+function startTimerAction(field) {
+
+    return setInterval(() => {
+        (game.speed > 0.7) ? 
+        agame.speed = 0.1 :
+        game.speed += game.accelerate;
+        game.enemyDy += 0.5;
+    
+        let newEnemy = {
+            'x' : 10,
+            'y' : -20,
+            'dx' : 0.5,
+            'dy' : 0.2,
+            'speed' : 0.07,
+            'type' : 2
+        };
+        for (let i=0; i<30; i++) {
+            if (i==10) {
+                newEnemy.x -= 60; 
+                newEnemy.y -= 30;
+            }
+            if (i==20) {
+                newEnemy.x -= 60; 
+                newEnemy.y -= 30;
+            }
+            newEnemy.x += 6;
+            newEnemy.y += 1;
+            addEnemy(field, newEnemy);
+        }
+    
+    }, game.accelerateTime); 
+}
+
+function startTimerMove(field, animate) {
+    return setInterval(() => {
+        shipMove(field);
+        enemiesMove(field, animate);
+    }, player.speed);
+}
+function startTimerWave(field) {
+    return setInterval(() => {
+        let randomEnemy = {
+            'x' : 1 + Math.floor(Math.random() * 99),
+            'y' : -10,
+            'dx' : -2 + Math.random() * 4,
+            'dy' : game.enemyDy + Math.random() * (2.0 - game.enemyDy),
+            'speed' : 0.03 + Math.random() * 0.03,
+            'type' : 1
+        }
+        addEnemy(field,randomEnemy);
+    }, game.enemiesGenerationSpeed);
+}
+
+/* Animation service function*/
 function SpriteSheet(path, frameWidth, frameHeight, endFrame, frameSpeed) {
     var image = new Image();
     var framesPerRow;

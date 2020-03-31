@@ -33,6 +33,28 @@
 .player.right {
     background-image: url('../img/shipRight.png');
 }
+.menu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index:9;
+    left: 3px;
+    top: 3px;
+    width: 5vw;
+    height: 3vw;
+    background-color: black;
+    border-radius: 10px;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-bottom: 2px solid white;
+    font-style: tahoma;
+    color:yellowgreen;
+    font-size: 16px;
+    font-weight: 800;
+}
 .shoot {
     z-index: 3;
     display: block;
