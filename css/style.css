@@ -15,7 +15,19 @@
     background-color: #212121;
     background-image: url('../img/fon.jpg');
     background-size: contain;
+    background-blend-mode: normal;
 }
+
+.field.darken {
+    background-blend-mode: darken;
+}
+.field.hardLight {
+    background-blend-mode: hard-light;
+}
+.field.colorBurn {
+    background-blend-mode: color-burn;
+}
+
 .player {
     display: block;
     position: fixed;
@@ -27,12 +39,7 @@
     background-image: url('../img/ship.png');
     background-size: contain;
 }
-.player.left {
-    background-image: url('../img/shipLeft.png');   
-}
-.player.right {
-    background-image: url('../img/shipRight.png');
-}
+
 .menu {
     position: fixed;
     display: flex;
