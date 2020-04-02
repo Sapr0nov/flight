@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", e => {
     canvas.style.position = "fixed";
     canvas.style.left = "0";
     canvas.style.top = "0";
-    canvas.style.opacity = "1";
+    canvas.style.opacity = "0";
     canvas.used = false;
    
     field.style.backgroundPositionX = '0vw';
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", e => {
     /* autofire */
     setInterval( () => {
         if (game.autoFire) {
-            game.shipFire(field);
+            game.shipFire();
         }
     }, game.fireSpeed);
 
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", e => {
         switch (e.keyCode) {
             case 71 : game.autoFire = !game.autoFire; break;
             case 49 : game.player.weapon = 1; game.offHyperMode(); game.slowMotion = 50; game.stopGame(); game.startGame();break;
-            case 50 : game.player.weapon = 2; game.changeMode('hyper'); game.slowMotion = 100; game.stopGame(); game.startGame(); break;
+            case 50 : game.player.weapon = 2;  break;
             case 51 : game.control = 'wasd';  field.style.cursor = 'pointer'; break;
             case 52 : game.control = 'mouse'; field.style.cursor = 'crosshair'; break;
             case 27 :
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", e => {
             case 65 : game.player.dx = 0; break;
             case 83 : game.player.dy = 0; break;
             case 68 : game.player.dx = 0; break;
-            case 70 :  game.shipFire(field);  break;
+            case 70 :  game.shipFire();  break;
         }
     });
 
@@ -81,9 +81,6 @@ document.addEventListener("DOMContentLoaded", e => {
 
         (cursorX > game.player.x + 2) ? game.player.dx = 1 : game.player.dx = -1;
         (cursorY > game.player.y + 3) ? game.player.dy = 1 : game.player.dy = -1;
-        if (cursorX < game.player.x + 2 && cursorX > game.player.x - 2 ) {game.player.dx = 0; }
-        if (cursorY < game.player.y + 2 && cursorY > game.player.y - 2 ) {game.player.dy = 0; }
-
     })
 
     document.addEventListener('click', e => {
@@ -92,9 +89,9 @@ document.addEventListener("DOMContentLoaded", e => {
     /*Right buttom*/
     document.addEventListener( "contextmenu", e => {
         e.preventDefault();
-        game.player.weapon = 2;
+    //    game.player.weapon = 2;
         game.shipFire();
-        game.player.weapon = 1;
+    //    game.player.weapon = 1;
       });
 
 

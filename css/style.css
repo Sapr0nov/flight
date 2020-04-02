@@ -160,3 +160,24 @@
 .enemy9 {
     background-image: url('../img/enemy09.png');
 }
+
+.bonus {
+    z-index: 2;
+    display: block;
+    position: fixed;
+    width: 6vw;
+    height: 6vw;
+    max-width: 100px;
+    max-height: 100px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.bonus1 {
+    background-image: url('../img/bonus1.png');
+}
+.bonus2 {
+    background-image: url('../img/bonus2.png');
+}
+.bonus3 {
+    background-image: url('../img/bonus3.png');
+}

@@ -21,13 +21,16 @@ export default class Game {
             weapon : 1,
         },
         this.emptyRide = false; // final line without enemies
-        this.autofire = true;
+        this.autoFire = true;
         this.paused = false;
         this.slowMotion = 50;
-        this.shoots = [],
+        this.shoots = [];
+        this.bonuses = [];
         this.enemies = [];
     }
 
+    #timer = 0;
+    #lastTime = 0;
     #speed = 0.09; // Xvh
     #accelerate = 0.1;  // shift  Xvh
     #accelerateTime = 25000; // add game.accelerate each X ms
@@ -46,13 +49,40 @@ export default class Game {
 
     
     
+    bonusActivate = (type) => {
+        switch (type) {
+            case 1 : this.player.weapon = 2;
+                     setTimeout(this.bonusDeActivate, 15000, type); 
+                    break;
+            case 2 :
+                this.slowMotion = 100;
+                this.changeMode('hyper');
+                this.stopGame();
+                this.startGame();
+                setTimeout(this.bonusDeActivate, 5000, type); 
+                    break;
+            case 3 : this.#score += 100000;
+                    break;
+        }
+    }
+    bonusDeActivate = (type) => {
+        switch (type) {
+            case 1 : this.player.weapon = 1;
+            case 2 : this.slowMotion = 50;
+                        this.offHyperMode();
+                        this.changeMode('wave');
+                        this.stopGame();
+                        this.startGame();
+                        break;
+            case 3 : break;
+        }
+    }
     offHyperMode = () => {
         this.field.classList.remove('darken'); 
-        this.mode = 'normal';
+        this.#mode = '';
     }
-    
     changeMode = (modeName) => {
-        if (this.#mode == 'hyper') {
+        if (this.#mode === 'hyper') {
             return;
         }
 
@@ -94,6 +124,10 @@ export default class Game {
             enemy.style.left = enemy.x+'vw';
             enemy.style.top = enemy.y+'vh';
         })
+        this.bonuses.forEach(bonus => {
+            bonus.style.left = bonus.x+'vw';
+            bonus.style.top = bonus.y+'vh';
+        })
     }
 
     shipMove = () => {
@@ -105,8 +139,9 @@ export default class Game {
             )))
         {
             console.log('game over');
-            this.ship.style.opacity = 0.1;
+            this.ship.style.opacity = 0.3;
         }
+
         if (this.control == 'wasd') {
             ( (this.player.x + this.player.dx * this.player.speed) <= 0 ) || ( (this.player.x + this.player.dx * this.player.speed) > 97 ) 
             ? this.player.dx = 0 
@@ -121,7 +156,7 @@ export default class Game {
             if (( (this.player.x + this.player.dx * this.player.speed) <= 0 ) || ( (this.player.x + this.player.dx * this.player.speed) > 97 )) {
                 this.player.dx = 0;
             }else{
-                if  (Math.abs(this.magnitoPoint.x - this.player.x - this.player.dx * this.player.speed) < Math.abs(this.magnitoPoint.x - this.player.x) ) {
+                if  (Math.abs(this.magnitoPoint.x - 2 - this.player.x - this.player.dx * this.player.speed) < Math.abs(this.magnitoPoint.x - 2 - this.player.x) ) {
                     this.player.x += this.player.dx * this.player.speed;
                 }else{
                     this.player.dx = 0;
@@ -131,14 +166,22 @@ export default class Game {
             if (( (this.player.y + this.player.dy * this.player.speed) <= 0 ) || ( (this.player.y + this.player.dy * this.player.speed) > 92 )) {
                 this.player.dy = 0 
             }else{
-                if  (Math.abs(this.magnitoPoint.y - this.player.y - this.player.dy * this.player.speed) < Math.abs(this.magnitoPoint.y - this.player.y) ) {
+                if  (Math.abs(this.magnitoPoint.y - 3 - this.player.y - this.player.dy * this.player.speed) < Math.abs(this.magnitoPoint.y - 3 - this.player.y) ) {
                     this.player.y += this.player.dy * this.player.speed;
                 }else{
                     this.player.dy = 0;
                 }
             }
         }
-        
+        this.bonuses.forEach((bonus,i) => {
+            if (Math.abs(bonus.x - this.player.x) > 3 || Math.abs(bonus.y - this.player.y) > 3 ) {
+                return
+            }
+            this.field.removeChild(bonus);
+            this.bonuses.splice(i,1);
+            this.bonusActivate(bonus.type);
+            return;
+        })
         /* Player's shoots */ 
         this.shoots.forEach((shoot,i) => {
 
@@ -168,10 +211,24 @@ export default class Game {
                     this.canvas.style.left = (enemy.x - 3) +"vw";
                     this.canvas.style.top = enemy.y+"vh";
                     this.#score += 100 * enemy.type;
+                    if (Math.random() * 100 < 10 ) {
+                        let bonus = document.createElement('div');
+                        this.field.appendChild(bonus);
+                        bonus.x = enemy.x;
+                        bonus.y = enemy.y;
+                        bonus.dx = 0;
+                        bonus.dy = 1;
+                        bonus.type = 1 + Math.floor(Math.random() * 3);
+                        bonus.speed = enemy.speed;
+                        bonus.classList.add('bonus');
+                        bonus.classList.add(`bonus${bonus.type}`);
+                        this.bonuses.push(bonus);
+                    }            
                     this.field.removeChild(enemy);
                     this.enemies.splice(i, 1);
                     this.field.removeChild(shoot);
                     this.shoots.splice(index, 1);
+
                     this.#animateID++; 
                     this.canvas.opacity = 1;
                     this.animate();  
@@ -200,8 +257,30 @@ export default class Game {
             enemy.y += enemy.dy * enemy.speed;
             
         });
-    
-    
+
+        this.bonuses.forEach((bonus,i) => {
+            if ( ((bonus.x + bonus.dx * bonus.speed) <= 0 ) || ( (bonus.x + bonus.dx * bonus.speed) > 95 ))
+            {
+                bonus.dx = -bonus.dx;
+            }
+            bonus.x += bonus.dx * bonus.speed;
+            
+            if( (bonus.y + bonus.dy * bonus.speed) < -10 ) 
+            {
+                bonus.dy = Math.abs(bonus.dy);
+                
+            }
+            if  ( (bonus.y + bonus.dy * bonus.speed) > 110 ) 
+            {
+                try {
+                    this.field.removeChild(bonus);
+                }catch(e) {
+                    console.log('err',bonus.tagName, this.bonuses);
+                }
+                this.bonuses.splice(i, 1);
+            }
+            bonus.y += bonus.dy * bonus.speed
+        });
     }
     
     shipFire = () => {
@@ -282,7 +361,7 @@ export default class Game {
         this.#timerLevel = setInterval( ()=> {
             this.emptyRide = true;
             setTimeout( this.checkFreeSky, 1000);
-        }, this.timeLevel);
+        }, (this.timeLevel - this.#lastTime) );
     } 
     
     startTimerBG = () => {
@@ -359,6 +438,7 @@ export default class Game {
     }
 
     stopGame = () => {
+        this.#lastTime = Date.now() - this.#timer;
         clearInterval(this.#timerLevel);
         clearInterval(this.#timerBG);
         clearInterval(this.#timerAction);
@@ -409,11 +489,11 @@ export default class Game {
         this.msgBox.innerHTML= `You WIN!<br/>Your score: ${this.#score} <br/><div class="newGameBtn">next Level</div>`;
         this.msgBox.querySelector('.newGameBtn').addEventListener('click', () => {
             this.msgBox.classList.add('hide');
+            this.#lastTime = 0;
+            this.#timer = Date.now();
             this.startGame();
         });
-        
-
-        // alert('You Win, your scrore:' + this.#score);
+       // alert('You Win, your scrore:' + this.#score);
     }
 
     animate = () => {
