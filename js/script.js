@@ -7,7 +7,9 @@ document.addEventListener("DOMContentLoaded", e => {
 
     const field = document.querySelector('.field');
     const ship = document.querySelector('.player');
+    const msgBox = document.querySelector(".messageBox");
     const canvas = document.getElementById("canvas");
+
     canvas.style.position = "fixed";
     canvas.style.left = "0";
     canvas.style.top = "0";
@@ -17,9 +19,9 @@ document.addEventListener("DOMContentLoaded", e => {
     field.style.backgroundPositionX = '0vw';
     field.style.backgroundPositionY = '0vh';
 
-    const game = new Game(field, ship, canvas, 60000,2000,300,'mouse');
+    const game = new Game(field, ship, msgBox, canvas, 60000,2000,300,'mouse');
 
-    game.startGame(field,ship);
+    game.startGame();
 
     /* autofire */
     setInterval( () => {
@@ -31,28 +33,34 @@ document.addEventListener("DOMContentLoaded", e => {
     /* Controls */
 
     document.addEventListener('keydown', e => {
-        console.log(e.keyCode);
-        // 32 Пробел
-        //80 P pause
+        switch (e.keyCode) {
+            case 71 : game.autoFire = !game.autoFire; break;
+            case 49 : game.player.weapon = 1; game.offHyperMode(); game.slowMotion = 50; game.stopGame(); game.startGame();break;
+            case 50 : game.player.weapon = 2; game.changeMode('hyper'); game.slowMotion = 100; game.stopGame(); game.startGame(); break;
+            case 51 : game.control = 'wasd';  field.style.cursor = 'pointer'; break;
+            case 52 : game.control = 'mouse'; field.style.cursor = 'crosshair'; break;
+            case 27 :
+            case 80 : game.stopGame();
+                      (game.paused) ? game.startGame() : game.paused = true; break;
+
+        }
+        
+        if (game.control === 'mouse') { 
+            return 
+        }
         switch (e.keyCode) {
             case 87 : game.player.dy = -1; break;
             case 65 : game.player.dx = -1; break;
             case 83 : game.player.dy = 1; break;
             case 68 : game.player.dx = 1;  break;
-            case 71 : game.autoFire = !game.autoFire; break;
-            case 49 : game.player.weapon = 1; game.offHyperMode(field); game.slowMotion = 1; game.stopGame(); game.startGame(field,ship);break;
-            case 50 : game.player.weapon = 2; game.changeMode(field,'hyper'); game.slowMotion = 200; game.stopGame(); game.startGame(field,ship); break;
-            case 51 : game.control = 'wasd';  document.querySelector('.field').style.cursor = 'pointer'; break;
-            case 52 : game.control = 'mouse'; break;
-            case 27 :
-            case 80 : game.stopGame();
-                      (game.paused) ? game.startGame(field,ship) : game.paused = true; break;
-
         }
        
     });
 
     document.addEventListener('keyup', e => {
+        if (game.control === 'mouse') { 
+            return 
+        }
         switch (e.keyCode) {
             case 87 : game.player.dy = 0; break;
             case 65 : game.player.dx = 0; break;
@@ -63,13 +71,13 @@ document.addEventListener("DOMContentLoaded", e => {
     });
 
     document.addEventListener('mousemove', e => {
-        if (game.control == 'wasd') return;
+        if (game.control === 'wasd') return;
 
         let cursorX = Math.floor(e.clientX / document.documentElement.clientWidth * 100);
         let cursorY = Math.floor(e.clientY / document.documentElement.clientHeight * 100);
         game.magnitoPoint = {'x': cursorX,'y': cursorY};
 
-        document.querySelector('.field').style.cursor = 'none'; //crosshair
+        field.style.cursor = 'crosshair'; //crosshair
 
         (cursorX > game.player.x + 2) ? game.player.dx = 1 : game.player.dx = -1;
         (cursorY > game.player.y + 3) ? game.player.dy = 1 : game.player.dy = -1;
@@ -79,13 +87,13 @@ document.addEventListener("DOMContentLoaded", e => {
     })
 
     document.addEventListener('click', e => {
-        game.shipFire(field);
+        game.shipFire();
     })
-
+    /*Right buttom*/
     document.addEventListener( "contextmenu", e => {
         e.preventDefault();
         game.player.weapon = 2;
-        game.shipFire(field);
+        game.shipFire();
         game.player.weapon = 1;
       });
 

@@ -61,6 +61,44 @@
     color:yellowgreen;
     font-size: 16px;
     font-weight: 800;
+    text-shadow: 2px 2px 2px gray;
+}
+.messageBox {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    width: 50vw;
+    height: 20vw;
+    left: 25vw;
+    top: 10vw;
+    background-color: #212121;
+    border-radius: 5px;
+    box-shadow: 3px 3px 10px #ffffff33;
+    justify-content: center;
+    align-items: center;
+    color: grey;
+    text-shadow: 1px 1px 1px #ffffff33;
+    font-family: Tahoma;
+}
+.newGameBtn{
+    width: 5vw;
+    min-width: 100px;
+    background-color: #211221;
+    color: lightskyblue;
+    border-radius: 4px;
+    border: 2px solid black;
+    box-shadow: 3px 3px 10px #ffffff33;
+    text-align: center;
+    padding: 5px;
+    margin-top: 12px;
+    cursor: pointer;
+}
+.newGameBtn:hover {
+    box-shadow: none;
+}
+.hide {
+    display:none;
 }
 .shoot {
     z-index: 3;

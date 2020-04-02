@@ -1,9 +1,10 @@
 import SpriteSheet from './spriteSheet.js'
 export default class Game {
-    constructor(field, ship, canvas, timeLevel,enemiesGenerationSpeed,fireSpeed,controlType) {
+    constructor(field, ship, msgBox, canvas, timeLevel,enemiesGenerationSpeed,fireSpeed,controlType) {
 
         this.field = field;
         this.ship = ship;
+        this.msgBox = msgBox;
         this.canvas = canvas;
 
         this.timeLevel = timeLevel;
@@ -19,8 +20,10 @@ export default class Game {
             speed : 0.1, // 1 reload per X ms 
             weapon : 1,
         },
+        this.emptyRide = false; // final line without enemies
         this.autofire = true;
         this.paused = false;
+        this.slowMotion = 50;
         this.shoots = [],
         this.enemies = [];
     }
@@ -36,7 +39,6 @@ export default class Game {
     #timerAction;
     #timerLevel;
     #animateID = 0;
-    #slowMotion = 1;
     #score = 0;
     #skyPosY = 0;
     #mode = 'normal';
@@ -45,20 +47,29 @@ export default class Game {
     
     
     offHyperMode = () => {
-        this.field.classList.remove('darken'); this.mode = 'normal';
+        this.field.classList.remove('darken'); 
+        this.mode = 'normal';
     }
     
     changeMode = (modeName) => {
         if (this.#mode == 'hyper') {
             return;
         }
+
         this.field.classList.remove('colorBurn');
         this.field.classList.remove('hardLight');
         this.field.classList.remove('darken');
+
         switch (modeName) {
-            case 'wave' : this.field.classList.add('hardLight'); this.#mode = 'wave'; break;
-            case 'boss' : this.field.classList.add('colorBurn'); this.#mode = 'boss'; break;
-            case 'hyper' : this.field.classList.add('darken'); this.#mode = 'hyper'; break;
+            case 'wave' : this.field.classList.add('hardLight'); 
+                            this.#mode = 'wave'; 
+                            break;
+            case 'boss' : this.field.classList.add('colorBurn'); 
+                            this.#mode = 'boss'; 
+                            break;
+            case 'hyper' : this.field.classList.add('darken'); 
+                            this.#mode = 'hyper'; 
+                            break;
         }
     };
     
@@ -236,7 +247,10 @@ export default class Game {
     } 
     
     addEnemy = (newEnemy) =>  {
-    
+        if (this.emptyRide) {
+            return
+        }
+
         if (this.enemies.length > 40) return;
         const enemy = document.createElement('div');
         this.field.appendChild(enemy);
@@ -266,8 +280,8 @@ export default class Game {
     startTimerLevel = () => {
         
         this.#timerLevel = setInterval( ()=> {
-            this.stopGame();
-            alert('YOU WIN, score:'+ this.#score);
+            this.emptyRide = true;
+            setTimeout( this.checkFreeSky, 1000);
         }, this.timeLevel);
     } 
     
@@ -275,7 +289,7 @@ export default class Game {
         return setInterval(() => {
             this.backgroundShift(this.field);
             this.drawShip(this.ship);
-        }, this.#skyFPS);
+        }, this.#skyFPS * (1 + this.slowMotion / 100));
     }
 
     startTimerAction = () => {
@@ -316,7 +330,7 @@ export default class Game {
         return setInterval(() => {
             this.shipMove();
             this.enemiesMove();
-        }, this.player.speed * this.#slowMotion); 
+        }, this.player.speed * (1 + this.slowMotion) ); 
     }
 
     startTimerWave = () => {
@@ -335,6 +349,7 @@ export default class Game {
     }
 
     startGame = () => {
+        this.emptyRide = false;
         this.startTimerLevel();
         this.#timerBG = this.startTimerBG();
         this.#timerAction = this.startTimerAction();
@@ -373,6 +388,32 @@ export default class Game {
         enemy.rotateDirection 
             ? enemy.style.backgroundPosition = bgX + 'vw ' + bgY +'vw'
             : enemy.style.backgroundPosition = bgX + 'vw ' + Number(bgY + 28) +'vw';
+    }
+
+    checkFreeSky = () => {
+        if (this.enemies.length <= 0) {
+            clearInterval(this.#timerWave);
+            this.offHyperMode();
+            this.changeMode('normal');
+            setTimeout(this.winMessage, 5000);
+            return true;
+        }
+
+        setTimeout(this.checkFreeSky, 1000);
+        return false; 
+    }
+
+    winMessage = () => {
+        this.stopGame();
+        this.msgBox.classList.remove('hide');
+        this.msgBox.innerHTML= `You WIN!<br/>Your score: ${this.#score} <br/><div class="newGameBtn">next Level</div>`;
+        this.msgBox.querySelector('.newGameBtn').addEventListener('click', () => {
+            this.msgBox.classList.add('hide');
+            this.startGame();
+        });
+        
+
+        // alert('You Win, your scrore:' + this.#score);
     }
 
     animate = () => {
