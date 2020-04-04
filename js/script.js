@@ -1,12 +1,10 @@
-
-import Game from './game.js'
-
-/* ============================================================================*/
+import Game from "./game.js"
 
 document.addEventListener("DOMContentLoaded", e => {
 
-    const field = document.querySelector('.field');
-    const ship = document.querySelector('.player');
+    const field = document.querySelector(".field");
+    const ship = document.querySelector(".player");
+    const score = document.querySelector(".score");
     const msgBox = document.querySelector(".messageBox");
     const canvas = document.getElementById("canvas");
 
@@ -16,15 +14,25 @@ document.addEventListener("DOMContentLoaded", e => {
     canvas.style.opacity = "0";
     canvas.used = false;
    
-    field.style.backgroundPositionX = '0vw';
-    field.style.backgroundPositionY = '0vh';
+    field.style.backgroundPositionX = "0vw";
+    field.style.backgroundPositionY = "0vh";
 
-    const game = new Game(field, ship, msgBox, canvas, 60000,2000,300,'mouse');
+    const gameParametrs = {
+        "field" : field,
+        "ship" : ship,
+        "msgBox" : msgBox,
+        "canvas" : canvas,
+        "score" : score,
+        "timeLevel" : 60000,
+        "enemiesGenerationSpeed" : 2000,
+        "fireSpeed" : 600,
+        "controlType" : "mouse",
+    }
+    const game = new Game(gameParametrs);
 
     game.startGame();
 
-    /* autofire */
-    setInterval( () => {
+     setInterval( () => {
         if (game.autoFire) {
             game.shipFire();
         }
@@ -32,20 +40,19 @@ document.addEventListener("DOMContentLoaded", e => {
 
     /* Controls */
 
-    document.addEventListener('keydown', e => {
+    document.addEventListener("keydown", e => {
         switch (e.keyCode) {
             case 71 : game.autoFire = !game.autoFire; break;
-            case 49 : game.player.weapon = 1; game.offHyperMode(); game.slowMotion = 50; game.stopGame(); game.startGame();break;
-            case 50 : game.player.weapon = 2;  break;
-            case 51 : game.control = 'wasd';  field.style.cursor = 'pointer'; break;
-            case 52 : game.control = 'mouse'; field.style.cursor = 'crosshair'; break;
+            case 49 : game.player.weapon = 1; break;
+            case 50 : game.player.weapon = 2; break;
+            case 51 : game.control = "wasd";  field.style.cursor = "pointer"; break;
+            case 52 : game.control = "mouse"; field.style.cursor = "crosshair"; break;
             case 27 :
-            case 80 : game.stopGame();
-                      (game.paused) ? game.startGame() : game.paused = true; break;
+            case 80 : game.paused = !game.paused; break;
 
         }
         
-        if (game.control === 'mouse') { 
+        if (game.control === "mouse") { 
             return 
         }
         switch (e.keyCode) {
@@ -57,8 +64,8 @@ document.addEventListener("DOMContentLoaded", e => {
        
     });
 
-    document.addEventListener('keyup', e => {
-        if (game.control === 'mouse') { 
+    document.addEventListener("keyup", e => {
+        if (game.control === "mouse") { 
             return 
         }
         switch (e.keyCode) {
@@ -70,28 +77,26 @@ document.addEventListener("DOMContentLoaded", e => {
         }
     });
 
-    document.addEventListener('mousemove', e => {
-        if (game.control === 'wasd') return;
+    document.addEventListener("mousemove", e => {
+        if (game.control === "wasd") return;
 
         let cursorX = Math.floor(e.clientX / document.documentElement.clientWidth * 100);
         let cursorY = Math.floor(e.clientY / document.documentElement.clientHeight * 100);
-        game.magnitoPoint = {'x': cursorX,'y': cursorY};
+        game.magnitoPoint = {"x": cursorX,"y": cursorY};
 
-        field.style.cursor = 'crosshair'; //crosshair
+        field.style.cursor = "crosshair"; //crosshair
 
         (cursorX > game.player.x + 2) ? game.player.dx = 1 : game.player.dx = -1;
         (cursorY > game.player.y + 3) ? game.player.dy = 1 : game.player.dy = -1;
     })
 
-    document.addEventListener('click', e => {
+    document.addEventListener("click", e => {
         game.shipFire();
     })
     /*Right buttom*/
     document.addEventListener( "contextmenu", e => {
         e.preventDefault();
-    //    game.player.weapon = 2;
-        game.shipFire();
-    //    game.player.weapon = 1;
+        game.autoFire = !game.autoFire;
       });
 
 

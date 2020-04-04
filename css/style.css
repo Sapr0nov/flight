@@ -17,7 +17,10 @@
     background-size: contain;
     background-blend-mode: normal;
 }
-
+#canvas {
+    width: 7vw;
+    height: 7vw;
+}
 .field.darken {
     background-blend-mode: darken;
 }
@@ -38,9 +41,10 @@
     background-repeat: no-repeat;
     background-image: url('../img/ship.png');
     background-size: contain;
+    transition: opacity 1s ease;
 }
 
-.menu {
+.score {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -51,6 +55,8 @@
     top: 3px;
     width: 5vw;
     height: 3vw;
+    min-width: 70px;
+    min-height: 40px;
     background-color: black;
     border-radius: 10px;
     border-top: 1px solid white;
@@ -104,8 +110,10 @@
     z-index: 3;
     display: block;
     position: fixed;
-    width: 10px;
-    height: 10px;
+    width: 0.5vw;
+    height: 0.5vw;
+    min-width: 4px;
+    min-height: 4px;
     background-color: wheat;
 }
 .shoot.shoot1 {
@@ -118,6 +126,11 @@
     border-radius: 50%;
     border: 2px solid black;
     background-color: lightskyblue;
+}
+.shoot.shootEnemy1 {
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: red;
 }
 .enemy {
     z-index: 2;
@@ -167,17 +180,34 @@
     position: fixed;
     width: 6vw;
     height: 6vw;
-    max-width: 100px;
-    max-height: 100px;
     background-size: contain;
     background-repeat: no-repeat;
 }
 .bonus1 {
+    background-size: 56vw 28vw;
     background-image: url('../img/bonus1.png');
 }
 .bonus2 {
+    background-size: 56vw 28vw;
     background-image: url('../img/bonus2.png');
 }
 .bonus3 {
+    background-size: 56vw 28vw;
     background-image: url('../img/bonus3.png');
+}
+.bonus4 {
+    background-size: 56vw 28vw;
+    background-image: url('../img/bonus4.png');
+}
+.bonus5 {
+    background-size: 35vw 28vw;
+    background-image: url('../img/bonus5.png');
+}
+.bonus6 {
+    background-size: 35vw 28vw;
+    background-image: url('../img/bonus6.png');
+}
+.bonus7 {
+    background-size: 35vw 28vw;
+    background-image: url('../img/bonus7.png');
 }
