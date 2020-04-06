@@ -8,6 +8,7 @@
     min-height: 400px;
     width: 100vw;
     height: 100vh;
+    background-color: black;
 }
 .field {
     width: 100%;
@@ -68,6 +69,12 @@
     font-size: 16px;
     font-weight: 800;
     text-shadow: 2px 2px 2px gray;
+}
+.messageBox button {
+    font-size: 18px;
+    background-color: #212121;
+    color: white;
+    font-weight: bold;
 }
 .messageBox {
     position: absolute;

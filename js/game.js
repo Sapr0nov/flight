@@ -233,10 +233,11 @@ export default class Game {
                         this.bonuses.push(bonus);
                     }  
                     try{
-                        enemy.style.opacity = 0;
                         this.field.removeChild(enemy);
                     }catch (e) {
-                        console.warn(enemy, enemy.parentNode);
+                        console.log(e);
+                        enemy.style.opacity = 0;
+                        this.refreshField();
                     }
                   
                     this.enemies.splice(i, 1);
@@ -474,7 +475,6 @@ export default class Game {
     // LEVEL SETTINGS
 
     newWave = () => {
-        console.log('newwave');
         (this.#speed > 0.7) ? 
         this.#speed = 0.1 :
         this.#speed += this.#accelerate;
@@ -701,5 +701,14 @@ export default class Game {
             cancelAnimationFrame(bangID);
         }
         this.#bang.draw(0, 0, ctx);
+    }
+    /* Errors */
+    refreshField = () => {
+        this.field.querySelectorAll('.enemy').forEach(el => {
+            el.style.opacity = "0";
+        })
+        this.enemies.forEach(el => {
+            el.style.opacity = "1";
+        })
     }
 }

@@ -1,5 +1,31 @@
 import Game from "./game.js"
 
+class loaderImages {
+    constructor(msgBox,...values) {
+        const images = [];
+        this.percent = 0;
+        this.msgBox = msgBox;
+        this.step = Math.floor(10000 / values.length);
+        for (let i = 0; i < values.length; i++) {
+            images[i] = new Image();
+            images[i].onload = this.notifyLoaded;
+            images[i].src = values[i];
+        }
+    }
+
+    statusUpdate = () => {
+        this.msgBox.innerHTML = `<h1>Loaded ${this.percent / 100 } %</h1>`;
+    }
+
+    notifyLoaded = () => {
+        this.percent += this.step;
+        this.statusUpdate();
+        if (this.percent > 9900) {
+            this.msgBox.innerHTML = `<h1>Success loaded.<br/> For start play press <button>'ESC'</button> </h1>`;
+        }
+    }
+}
+
 document.addEventListener("DOMContentLoaded", e => {
 
     const field = document.querySelector(".field");
@@ -17,6 +43,24 @@ document.addEventListener("DOMContentLoaded", e => {
     field.style.backgroundPositionX = "0vw";
     field.style.backgroundPositionY = "0vh";
 
+    const preloadImages = new loaderImages(msgBox,
+        "../img/fon.jpg",
+        "../img/bang.png",
+        "../img/ship.png",
+        "../img/bang.png",
+        "../img/asteroid.png",
+        "../img/enemy02.png",
+        "../img/enemy03.png",
+        "../img/enemy07.png",
+        "../img/bonus1.png",
+        "../img/bonus2.png",
+        "../img/bonus3.png",
+        "../img/bonus4.png",
+        "../img/bonus5.png",
+        "../img/bonus6.png",
+        "../img/bonus7.png",
+        );
+        
     const gameParametrs = {
         "field" : field,
         "ship" : ship,
@@ -31,6 +75,10 @@ document.addEventListener("DOMContentLoaded", e => {
     const game = new Game(gameParametrs);
 
     game.startGame();
+    game.paused = true;
+    msgBox.innerHtml 
+    msgBox.classList.remove('hide');
+
 
      setInterval( () => {
         if (game.autoFire) {
@@ -48,7 +96,7 @@ document.addEventListener("DOMContentLoaded", e => {
             case 51 : game.control = "wasd";  field.style.cursor = "pointer"; break;
             case 52 : game.control = "mouse"; field.style.cursor = "crosshair"; break;
             case 27 :
-            case 80 : game.paused = !game.paused; break;
+            case 80 : game.paused = !game.paused; msgBox.classList.add('hide'); break;
 
         }
         
@@ -99,5 +147,12 @@ document.addEventListener("DOMContentLoaded", e => {
         game.autoFire = !game.autoFire;
       });
 
+      document.addEventListener("click", e => {
+        if (e.target.tagName === 'BUTTON') {
+            e.preventDefault();
+            game.paused = !game.paused; 
+            msgBox.classList.add('hide');          
+        }
+    })
 
 });
